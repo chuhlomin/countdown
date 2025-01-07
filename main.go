@@ -37,6 +37,8 @@ func run() error {
 	textColor := flag.String("c", "white", "text color")
 	timeFrom := flag.Duration("from", 0, "start time")
 	maxFramex := flag.Int("max", 0, "max frames")
+	width := flag.Int("w", 600, "image width")
+	height := flag.Int("h", 400, "image height")
 	out := flag.String("o", "output.gif", "output file")
 	flag.Parse()
 
@@ -69,7 +71,7 @@ func run() error {
 	var frames []image.Image
 
 	for *timeFrom > 0 && (*maxFramex == 0 || count < *maxFramex) {
-		frame, err := renderFrame(fontFace, bg, c, timeFrom)
+		frame, err := renderFrame(*width, *height, fontFace, bg, c, timeFrom)
 		if err != nil {
 			return fmt.Errorf("failed to render frame: %v", err)
 		}
@@ -168,12 +170,13 @@ func parseHexColor(hex string) (c color.RGBA, err error) {
 }
 
 func renderFrame(
+	width, height int,
 	fontFace font.Face,
 	bg, c color.Color,
 	timerDuration *time.Duration,
 ) (image.Image, error) {
 	// create image 600×400 pixels with black background and white text
-	img := image.NewRGBA(image.Rect(0, 0, 600, 400))
+	img := image.NewRGBA(image.Rect(0, 0, width, height))
 	draw.Draw(img, img.Bounds(), &image.Uniform{bg}, image.ZP, draw.Src)
 
 	text := formatTime(timerDuration)
