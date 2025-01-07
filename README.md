@@ -7,6 +7,8 @@ Available flags:
 ```
   -bg string
     	background color (default "black")
+  -bi string
+   	path to background image (optional)
   -c string
     	text color (default "white")
   -ca

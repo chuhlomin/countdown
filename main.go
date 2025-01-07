@@ -7,6 +7,8 @@ import (
 	"image/color"
 	"image/draw"
 	"image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"log"
 	"os"
@@ -35,6 +37,7 @@ func run() error {
 	fontPath := flag.String("f", "", "path to font file")
 	fontSize := flag.Float64("s", 48, "font size")
 	backgroundColor := flag.String("bg", "black", "background color")
+	backgroundImage := flag.String("bi", "", "path to background image (optional)")
 	textColor := flag.String("c", "white", "text color")
 	timeFrom := flag.Duration("from", 0, "start time")
 	maxFramex := flag.Int("max", 0, "max frames")
@@ -84,6 +87,14 @@ func run() error {
 		*colonCompensation = (fontFace.Metrics().CapHeight.Ceil() - fontFace.Metrics().XHeight.Ceil()) / 2
 	}
 
+	var bi *image.Image
+	if *backgroundImage != "" {
+		bi, err = loadImage(*backgroundImage)
+		if err != nil {
+			return fmt.Errorf("failed to load background image: %v", err)
+		}
+	}
+
 	for *timeFrom > 0 && (*maxFramex == 0 || count < *maxFramex) {
 		frame, err := renderFrame(
 			*width,
@@ -92,6 +103,7 @@ func run() error {
 			fontFace,
 			bg,
 			c,
+			bi,
 			timeFrom,
 			*colonCompensation,
 		)
@@ -192,17 +204,36 @@ func parseHexColor(hex string) (c color.RGBA, err error) {
 	return
 }
 
+func loadImage(path string) (*image.Image, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open file: %v", err)
+	}
+
+	img, _, err := image.Decode(f)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode image: %v", err)
+	}
+
+	return &img, nil
+}
+
 func renderFrame(
 	width, height int,
 	d *font.Drawer,
 	fontFace font.Face,
 	bg, c color.Color,
+	bi *image.Image,
 	timerDuration *time.Duration,
 	colonCompensation int,
 ) (image.Image, error) {
 	// create image 600×400 pixels with black background and white text
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
 	draw.Draw(img, img.Bounds(), &image.Uniform{bg}, image.ZP, draw.Src)
+
+	if bi != nil {
+		draw.Draw(img, img.Bounds(), *bi, image.ZP, draw.Over)
+	}
 
 	d.Dst = img
 
