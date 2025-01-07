@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"golang.org/x/image/colornames"
@@ -40,6 +41,8 @@ func run() error {
 	width := flag.Int("w", 600, "image width")
 	height := flag.Int("h", 400, "image height")
 	out := flag.String("o", "output.gif", "output file")
+	colonCompensation := flag.Int("cy", 0, "compensate for colon Y position")
+	colonCompensationAuto := flag.Bool("ca", false, "auto compensate for colon Y position")
 	flag.Parse()
 
 	var (
@@ -70,8 +73,28 @@ func run() error {
 
 	var frames []image.Image
 
+	fontDrawer := &font.Drawer{
+		Src:  image.NewUniform(c),
+		Face: fontFace,
+	}
+
+	if *colonCompensationAuto {
+		// for most fonts, the colon is placed at the bottom of the cell, and has x-height height
+		// to center it vertically, we need to move it up by (capHeight - xHeight) / 2
+		*colonCompensation = (fontFace.Metrics().CapHeight.Ceil() - fontFace.Metrics().XHeight.Ceil()) / 2
+	}
+
 	for *timeFrom > 0 && (*maxFramex == 0 || count < *maxFramex) {
-		frame, err := renderFrame(*width, *height, fontFace, bg, c, timeFrom)
+		frame, err := renderFrame(
+			*width,
+			*height,
+			fontDrawer,
+			fontFace,
+			bg,
+			c,
+			timeFrom,
+			*colonCompensation,
+		)
 		if err != nil {
 			return fmt.Errorf("failed to render frame: %v", err)
 		}
@@ -171,31 +194,56 @@ func parseHexColor(hex string) (c color.RGBA, err error) {
 
 func renderFrame(
 	width, height int,
+	d *font.Drawer,
 	fontFace font.Face,
 	bg, c color.Color,
 	timerDuration *time.Duration,
+	colonCompensation int,
 ) (image.Image, error) {
 	// create image 600×400 pixels with black background and white text
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
 	draw.Draw(img, img.Bounds(), &image.Uniform{bg}, image.ZP, draw.Src)
 
-	text := formatTime(timerDuration)
+	d.Dst = img
 
-	d := &font.Drawer{
-		Dst:  img,
-		Src:  image.NewUniform(c),
-		Face: fontFace,
+	// not all fonts support tabular numbers,
+	// so to avoid text jumping, we need to split it into parts
+	// and draw each part separately, keeping ":" at the same position
+	parts := formatTime(timerDuration)
+
+	colonWidth := d.MeasureString(":")
+	maxDigitsWidth, digit := findMaxDigitsWidth(d)
+	totalWidth := d.MeasureString(strings.Repeat(":", len(parts)-1))
+	for _, part := range parts {
+		totalWidth += d.MeasureString(strings.Repeat(digit, len(part)))
 	}
-	d.Dot = fixed.Point26_6{
-		X: (fixed.I(img.Bounds().Dx()) - d.MeasureString(text)) / 2,
-		Y: fixed.I(img.Bounds().Dy()+fontFace.Metrics().CapHeight.Ceil()) / 2,
+
+	x := (fixed.I(img.Bounds().Dx()) - totalWidth) / 2
+	y := fixed.I(img.Bounds().Dy()+fontFace.Metrics().CapHeight.Ceil()) / 2
+	d.Dot = fixed.Point26_6{X: x, Y: y}
+
+	for i, part := range parts {
+		d.Dot.X = x
+
+		if i > 0 {
+			d.Dot.Y -= fixed.I(colonCompensation)
+			d.DrawString(":")
+			d.Dot.Y = y
+			x += colonWidth
+		}
+
+		for _, r := range part {
+			// align digits to the center of the "cell"
+			d.Dot.X = x + (maxDigitsWidth-d.MeasureString(string(r)))/2
+			x += maxDigitsWidth
+			d.DrawString(string(r))
+		}
 	}
-	d.DrawString(text)
 
 	return img, nil
 }
 
-func formatTime(d *time.Duration) string {
+func formatTime(d *time.Duration) []string {
 	// format time as 00:00:00 if it's more than 1 hour
 	// or 00:00 if it's less than 1 hour
 
@@ -204,10 +252,33 @@ func formatTime(d *time.Duration) string {
 	s := int(d.Seconds()) % 60
 
 	if h > 0 {
-		return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
+		return []string{
+			fmt.Sprintf("%02d", h),
+			fmt.Sprintf("%02d", m),
+			fmt.Sprintf("%02d", s),
+		}
 	}
 
-	return fmt.Sprintf("%02d:%02d", m, s)
+	return []string{
+		fmt.Sprintf("%02d", m),
+		fmt.Sprintf("%02d", s),
+	}
+}
+
+func findMaxDigitsWidth(d *font.Drawer) (fixed.Int26_6, string) {
+	var (
+		max  fixed.Int26_6
+		maxS string
+	)
+	for i := 0; i < 10; i++ {
+		s := fmt.Sprintf("%d", i)
+		w := d.MeasureString(s)
+		if w > max {
+			max = w
+			maxS = s
+		}
+	}
+	return max, maxS
 }
 
 func saveFile(frames []image.Image, path string) error {
@@ -223,11 +294,11 @@ func saveFile(frames []image.Image, path string) error {
 		LoopCount: -1,
 	}
 
-	pallete := choosePalette(frames)
-	log.Printf("Pallete has %d colors", len(pallete))
+	palette := choosePalette(frames)
+	log.Printf("Palette has %d colors", len(palette))
 
 	for i, frame := range frames {
-		g.Image[i] = image.NewPaletted(frame.Bounds(), pallete)
+		g.Image[i] = image.NewPaletted(frame.Bounds(), palette)
 		draw.FloydSteinberg.Draw(g.Image[i], frame.Bounds(), frame, image.ZP)
 		g.Delay[i] = 100
 	}
