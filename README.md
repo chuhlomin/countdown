@@ -2,6 +2,10 @@
 
 Tiny Go app that generates a GIF image with timer countdown.
 
+Example:
+
+![output.gif](https://github.com/user-attachments/assets/3866f8c6-e035-4d2c-bc85-d696b80ca139)
+
 Available flags:
 
 ```
