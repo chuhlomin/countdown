@@ -1,4 +1,4 @@
-# git-experiment
+# gif-experiment
 
 Tiny Go app that generates a GIF image with timer countdown.
 
