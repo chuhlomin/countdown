@@ -1,0 +1,16 @@
+# golang.org/x/image v0.23.0
+## explicit; go 1.18
+golang.org/x/image/colornames
+golang.org/x/image/font
+golang.org/x/image/font/basicfont
+golang.org/x/image/font/opentype
+golang.org/x/image/font/sfnt
+golang.org/x/image/math/fixed
+golang.org/x/image/vector
+# golang.org/x/text v0.21.0
+## explicit; go 1.18
+golang.org/x/text/encoding
+golang.org/x/text/encoding/charmap
+golang.org/x/text/encoding/internal
+golang.org/x/text/encoding/internal/identifier
+golang.org/x/text/transform
