@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/chuhlomin/gif-experiment/countdown"
+	"github.com/chuhlomin/countdown"
 )
 
 func main() {

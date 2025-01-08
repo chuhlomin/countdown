@@ -1,4 +1,4 @@
-module github.com/chuhlomin/gif-experiment
+module github.com/chuhlomin/countdown
 
 go 1.23.1
 
