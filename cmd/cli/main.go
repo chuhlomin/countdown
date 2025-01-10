@@ -47,7 +47,7 @@ func run() error {
 		countdown.WithFontSize(*fontSize),
 		countdown.WithFontPath(*fontPath),
 		countdown.WithBackgroundColor(*backgroundColor),
-		countdown.WithBackgroundImage(*backgroundImage),
+		countdown.WithBackgroundImagePath(*backgroundImage),
 		countdown.WithTextColor(*textColor),
 		countdown.WithTimeFrom(*timeFrom),
 		countdown.WithTargetTime(*targetTime),

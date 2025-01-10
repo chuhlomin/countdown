@@ -75,7 +75,7 @@ func WithBackgroundColor(c string) Option {
 	}
 }
 
-func WithBackgroundImage(path string) Option {
+func WithBackgroundImagePath(path string) Option {
 	return func(g *Generator) error {
 		if path == "" {
 			return nil
