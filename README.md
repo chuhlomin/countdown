@@ -87,7 +87,7 @@ go run ./cmd/cli \
   -max 100
 ```
 
-# server
+## server
 
 At `cmd/server` there is a simple HTTP server that uses the library.
 
@@ -102,10 +102,11 @@ Then open `http://localhost:8080/?from=1m` in your browser.
 It supports almost the same flags as the CLI app, but they should be passed as query parameters, e.g.:
 
 ```
-http://localhost:8080/?s=100&f=Gorton%20Digital%20Light.otf&bg=%23E2D9C5&c=%23141414&from=2h&max=10&ca&bi=retro1.png
+http://localhost:8080/?s=100&f=Gorton%20Digital%20Light.otf&bg=%23E2D9C5&c=%23141414&from=2h&max=10&ca&bi=retro.png
 ```
 
-(assuming you have `fonts` and `images` directories in the `cmd/server` directory)
+(assuming you have `cmd/server/fonts` directory)
+
 Docker-compose file is provided for the server:
 
 ```
