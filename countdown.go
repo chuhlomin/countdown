@@ -31,6 +31,7 @@ type Generator struct {
 	colonCompensation      int
 	paletteMaxColors       int
 	colonCompoensationAuto bool
+	noLeadingZeros         bool
 }
 
 func NewGenerator(opts ...Option) (*Generator, error) {
@@ -115,7 +116,7 @@ func (g *Generator) renderFrame(d *font.Drawer) (image.Image, error) {
 	// not all fonts support tabular numbers,
 	// so to avoid text jumping, we need to split it into parts
 	// and draw each part separately, keeping ":" at the same position
-	parts := formatTime(g.timeFrom)
+	parts := formatTime(g.timeFrom, g.noLeadingZeros)
 
 	colonWidth := d.MeasureString(":")
 	maxDigitsWidth, digit := findMaxDigitsWidth(d)
@@ -149,7 +150,7 @@ func (g *Generator) renderFrame(d *font.Drawer) (image.Image, error) {
 	return img, nil
 }
 
-func formatTime(d time.Duration) []string {
+func formatTime(d time.Duration, noLeadingZeros bool) []string {
 	// format time as 00:00:00 if it's more than 1 hour
 	// or 00:00 if it's less than 1 hour
 
@@ -157,16 +158,21 @@ func formatTime(d time.Duration) []string {
 	m := int(d.Minutes()) % 60
 	s := int(d.Seconds()) % 60
 
+	firstPartFormat := "%02d"
+	if noLeadingZeros {
+		firstPartFormat = "%d"
+	}
+
 	if h > 0 {
 		return []string{
-			fmt.Sprintf("%02d", h),
+			fmt.Sprintf(firstPartFormat, h),
 			fmt.Sprintf("%02d", m),
 			fmt.Sprintf("%02d", s),
 		}
 	}
 
 	return []string{
-		fmt.Sprintf("%02d", m),
+		fmt.Sprintf(firstPartFormat, m),
 		fmt.Sprintf("%02d", s),
 	}
 }

@@ -34,6 +34,7 @@ func run() error {
 	colonCompensation := flag.Int("cy", 0, "compensate for colon Y position")
 	colonCompensationAuto := flag.Bool("ca", false, "auto compensate for colon Y position")
 	paletteMaxColors := flag.Int("pm", 0, "max colors in palette")
+	noLeadingZeros := flag.Bool("no0", false, "trim leading zeros")
 	flag.Parse()
 
 	if *fontPath == "" {
@@ -57,6 +58,10 @@ func run() error {
 
 	if *colonCompensationAuto {
 		opts = append(opts, countdown.WithColonCompensationAuto())
+	}
+
+	if *noLeadingZeros {
+		opts = append(opts, countdown.WithoutLeadingZeros())
 	}
 
 	gen, err := countdown.NewGenerator(opts...)

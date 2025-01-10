@@ -163,6 +163,13 @@ func WithPaletteMaxColors(n int) Option {
 	}
 }
 
+func WithoutLeadingZeros() Option {
+	return func(g *Generator) error {
+		g.noLeadingZeros = true
+		return nil
+	}
+}
+
 func loadFont(path string, size float64) (font.Face, error) {
 	f, err := os.Open(path)
 	if err != nil {
