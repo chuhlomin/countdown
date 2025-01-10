@@ -1,6 +1,7 @@
 package countdown
 
 import (
+	"bytes"
 	"fmt"
 	"image"
 	"image/color"
@@ -44,7 +45,18 @@ func WithFontPath(path string) Option {
 		}
 
 		var err error
-		g.fontFace, err = loadFont(path, float64(g.fontSize))
+		g.fontFace, err = loadFont(path, g.fontSize)
+		if err != nil {
+			return fmt.Errorf("failed to load font: %v", err)
+		}
+		return nil
+	}
+}
+
+func WithFontOpenTypeData(data []byte) Option {
+	return func(g *Generator) error {
+		var err error
+		g.fontFace, err = loadOpenTypeFont(data, g.fontSize)
 		if err != nil {
 			return fmt.Errorf("failed to load font: %v", err)
 		}
@@ -71,6 +83,17 @@ func WithBackgroundImage(path string) Option {
 
 		var err error
 		g.backgroundImage, err = loadImage(path)
+		if err != nil {
+			return fmt.Errorf("failed to load image: %v", err)
+		}
+		return nil
+	}
+}
+
+func WithBackgroundImageData(data []byte) Option {
+	return func(g *Generator) error {
+		var err error
+		g.backgroundImage, err = loadImageData(data)
 		if err != nil {
 			return fmt.Errorf("failed to load image: %v", err)
 		}
@@ -207,6 +230,15 @@ func loadImage(path string) (*image.Image, error) {
 	}
 
 	img, _, err := image.Decode(f)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode image: %v", err)
+	}
+
+	return &img, nil
+}
+
+func loadImageData(data []byte) (*image.Image, error) {
+	img, _, err := image.Decode(bytes.NewReader(data))
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode image: %v", err)
 	}
