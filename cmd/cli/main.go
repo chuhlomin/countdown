@@ -38,7 +38,7 @@ func run() error {
 		log.Println("Font path is not provided, using basicfont")
 	}
 
-	gen, err := countdown.NewGenerator(
+	opts := []countdown.Option{
 		countdown.WithWidth(*width),
 		countdown.WithHeight(*height),
 		countdown.WithFontSize(*fontSize),
@@ -49,8 +49,13 @@ func run() error {
 		countdown.WithTimeFrom(*timeFrom),
 		countdown.WithMaxFrames(*maxFrames),
 		countdown.WithColonCompensation(*colonCompensation),
-		countdown.WithColonCompensationAuto(*colonCompensationAuto),
-	)
+	}
+
+	if *colonCompensationAuto {
+		opts = append(opts, countdown.WithColonCompensationAuto())
+	}
+
+	gen, err := countdown.NewGenerator(opts...)
 	if err != nil {
 		return fmt.Errorf("failed to create generator: %v", err)
 	}

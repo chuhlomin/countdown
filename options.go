@@ -110,9 +110,9 @@ func WithColonCompensation(y int) Option {
 	}
 }
 
-func WithColonCompensationAuto(auto bool) Option {
+func WithColonCompensationAuto() Option {
 	return func(g *Generator) error {
-		g.colonCompoensationAuto = auto
+		g.colonCompoensationAuto = true
 		return nil
 	}
 }
