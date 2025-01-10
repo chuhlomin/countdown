@@ -106,3 +106,10 @@ http://localhost:8080/?s=100&f=Gorton%20Digital%20Light.otf&bg=%23E2D9C5&c=%2314
 ```
 
 (assuming you have `fonts` and `images` directories in the `cmd/server` directory)
+Docker-compose file is provided for the server:
+
+```
+docker-compose up
+```
+
+Then open `http://localhost:8080/?s=140&f=Gidolinya-Regular.otf&bg=%23E2D9C5&c=%23141414&from=2h&max=10&ca&bi=retro.png` in your browser.
