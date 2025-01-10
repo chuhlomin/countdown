@@ -55,7 +55,7 @@ Available flags:
   -f string
     	path to font file
   -from duration
-    	start time
+   	duration to start countdown from
   -h int
      	image height (default 400)
   -max int
@@ -66,6 +66,8 @@ Available flags:
    	max colors in palette
   -s float
     	font size (default 48)
+  -t int
+   	target time in Unix format
   -w int
    	image width (default 600)
 ```
@@ -75,6 +77,8 @@ If `-f` flag is not provided, the app will use the default Face7x13 font.
 If `-max` flag is not provided, the app will generate all frames until the end of the countdown.
 
 If `-ca` flag is provided, `-cy` flag will be ignored.
+
+`-t` is an alternative to `-from` flag. If both are provided, latter will be used.
 
 Example:
 

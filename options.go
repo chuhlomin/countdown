@@ -119,6 +119,19 @@ func WithTimeFrom(d time.Duration) Option {
 	}
 }
 
+func WithTargetTime(t int) Option {
+	return func(g *Generator) error {
+		if t == 0 {
+			return nil
+		}
+		g.timeFrom = time.Until(time.Unix(int64(t), 0))
+		if g.timeFrom < 0 {
+			return fmt.Errorf("target time is in the past")
+		}
+		return nil
+	}
+}
+
 func WithMaxFrames(max int) Option {
 	return func(g *Generator) error {
 		g.maxFrames = max

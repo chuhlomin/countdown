@@ -25,7 +25,8 @@ func run() error {
 	backgroundColor := flag.String("bg", "black", "background color")
 	backgroundImage := flag.String("bi", "", "path to background image (optional)")
 	textColor := flag.String("c", "white", "text color")
-	timeFrom := flag.Duration("from", 0, "start time")
+	timeFrom := flag.Duration("from", 0, "duration to start countdown from")
+	targetTime := flag.Int("t", 0, "target time in Unix format")
 	maxFrames := flag.Int("max", 0, "max frames")
 	width := flag.Int("w", 600, "image width")
 	height := flag.Int("h", 400, "image height")
@@ -48,6 +49,7 @@ func run() error {
 		countdown.WithBackgroundImage(*backgroundImage),
 		countdown.WithTextColor(*textColor),
 		countdown.WithTimeFrom(*timeFrom),
+		countdown.WithTargetTime(*targetTime),
 		countdown.WithMaxFrames(*maxFrames),
 		countdown.WithColonCompensation(*colonCompensation),
 		countdown.WithPaletteMaxColors(*paletteMaxColors),
