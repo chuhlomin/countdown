@@ -19,18 +19,18 @@ import (
 )
 
 type Generator struct {
-	width                  int
-	height                 int
-	fontSize               float64
 	fontFace               font.Face
 	backgroundColor        color.Color
-	backgroundImage        *image.Image
 	textColor              color.Color
+	backgroundImage        *image.Image
 	timeFrom               time.Duration
+	fontSize               float64
+	width                  int
+	height                 int
 	maxFrames              int
 	colonCompensation      int
-	colonCompoensationAuto bool
 	paletteMaxColors       int
+	colonCompoensationAuto bool
 }
 
 func NewGenerator(opts ...Option) (*Generator, error) {
