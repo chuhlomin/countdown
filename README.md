@@ -35,50 +35,39 @@ func main() {
 
 ```
 
+## Options
+
+| Option                      | CLI flag | GET parameter | Description                          | Default      |
+| --------------------------- | -------- | ------------- | ------------------------------------ | ------------ |
+| `WithBackgroundColor`       | `-bg`    | `bg`          | Background color                     | "black"      |
+| `WithBackgroundImageData`   |          |               | Background image bytes (optional)    |              |
+| `WithBackgroundImagePath`   | `-bi`    | `bi`          | Path to background image (optional)  |              |
+| `WithColonCompensationAuto` | `-ca`    | `ca`          | Auto compensate for colon Y position | false        |
+| `WithColonCompensation`     | `-cy`    | `cy`          | Compensate for colon Y position      | 0            |
+| `WithFontOpenTypeData`      |          |               | OpenType font bytes                  |              |
+| `WithFontPath`              | `-f`     | `f`           | Path to font file                    |              |
+| `WithFontSize`              | `-s`     | `s`           | Font size                            | 48           |
+| `WithImageHeight`           | `-h`     | `h`           | Image height                         | 400          |
+| `WithImageWidth`            | `-w`     | `w`           | Image width                          | 600          |
+| `WithMaxFrames`             | `-max`   | `max`         | Max frames                           |              |
+| `WithoutLeadingZeros`       | `-no0`   | `no0`         | Do not show leading zeros            | false        |
+| `WithPaletteMaxColors`      | `-pm`    | `pm`          | Max colors in palette                | 256          |
+| `WithTargetTime`            | `-t`     | `t`           | Target time in Unix format           |              |
+| `WithTextColor`             | `-c`     | `c`           | Text color                           | "white"      |
+| `WithTimeFrom`              | `-from`  | `from`        | Duration to start countdown from     |              |
+|                             | `-o`     |               | Output file                          | "output.gif" |
+
+If font is not provided, the app will use the default fixed-size `Face7x13` font.
+
+If `WithMaxFrames` is not provided, the app will generate all frames until the end of the countdown.
+
+If `WithColonCompensationAuto` flag is provided, `WithColonCompensation` flag will be ignored.
+
+`WithTargetTime` is an alternative to `WithTimeFrom` option. If both are provided, latter will be used.
+
 ## cli
 
 At `cmd/cli` there is a simple CLI app that uses the library.
-
-Available flags:
-
-```
-  -bg string
-    	background color (default "black")
-  -bi string
-   	path to background image (optional)
-  -c string
-    	text color (default "white")
-  -ca
-   	auto compensate for colon Y position
-  -cy int
-   	compensate for colon Y position
-  -f string
-    	path to font file
-  -from duration
-   	duration to start countdown from
-  -h int
-     	image height (default 400)
-  -max int
-    	max frames
-  -o string
-    	output file (default "output.gif")
-  -pm int
-   	max colors in palette
-  -s float
-    	font size (default 48)
-  -t int
-   	target time in Unix format
-  -w int
-   	image width (default 600)
-```
-
-If `-f` flag is not provided, the app will use the default Face7x13 font.
-
-If `-max` flag is not provided, the app will generate all frames until the end of the countdown.
-
-If `-ca` flag is provided, `-cy` flag will be ignored.
-
-`-t` is an alternative to `-from` flag. If both are provided, latter will be used.
 
 Example:
 
