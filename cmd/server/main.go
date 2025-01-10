@@ -20,6 +20,11 @@ var img embed.FS
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path != "/" {
+			http.NotFound(w, req)
+			return
+		}
+
 		opts, err := processRequest(req)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed to process request: %v", err), http.StatusBadRequest)
