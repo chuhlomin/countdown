@@ -62,6 +62,8 @@ Available flags:
     	max frames
   -o string
     	output file (default "output.gif")
+  -pm int
+   	max colors in palette
   -s float
     	font size (default 48)
   -w int

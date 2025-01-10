@@ -140,6 +140,16 @@ func WithColonCompensationAuto() Option {
 	}
 }
 
+func WithPaletteMaxColors(n int) Option {
+	return func(g *Generator) error {
+		if n <= 0 {
+			return nil
+		}
+		g.paletteMaxColors = n
+		return nil
+	}
+}
+
 func loadFont(path string, size float64) (font.Face, error) {
 	f, err := os.Open(path)
 	if err != nil {

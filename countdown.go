@@ -9,7 +9,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"io"
-	"log"
+	"sort"
 	"strings"
 	"time"
 
@@ -30,6 +30,7 @@ type Generator struct {
 	maxFrames              int
 	colonCompensation      int
 	colonCompoensationAuto bool
+	paletteMaxColors       int
 }
 
 func NewGenerator(opts ...Option) (*Generator, error) {
@@ -85,8 +86,7 @@ func (g *Generator) Write(w io.Writer) error {
 		LoopCount: -1,
 	}
 
-	palette := choosePalette(frames)
-	log.Printf("Palette has %d colors", len(palette))
+	palette := choosePalette(frames, g.paletteMaxColors)
 
 	for i, frame := range frames {
 		gw.Image[i] = image.NewPaletted(frame.Bounds(), palette)
@@ -187,8 +187,8 @@ func findMaxDigitsWidth(d *font.Drawer) (fixed.Int26_6, string) {
 	return max, maxS
 }
 
-func choosePalette(frames []image.Image) color.Palette {
-	colorsMap := map[color.Color]interface{}{}
+func choosePalette(frames []image.Image, max int) color.Palette {
+	colorsMap := map[color.Color]int{}
 
 	for _, frame := range frames {
 		for i := 0; i < len(frame.(*image.RGBA).Pix); i += 4 {
@@ -197,13 +197,37 @@ func choosePalette(frames []image.Image) color.Palette {
 				frame.(*image.RGBA).Pix[i+1],
 				frame.(*image.RGBA).Pix[i+2],
 				frame.(*image.RGBA).Pix[i+3],
-			}] = nil
+			}]++
 		}
 	}
 
-	colors := make([]color.Color, 0, len(colorsMap))
-	for color := range colorsMap {
-		colors = append(colors, color)
+	if max == 0 || len(colorsMap) <= max {
+		colors := make([]color.Color, 0, len(colorsMap))
+		for color := range colorsMap {
+			colors = append(colors, color)
+		}
+		return color.Palette(colors)
+	}
+
+	// sort colors by frequency
+	// and choose the most frequent ones
+	type colorFreq struct {
+		color color.Color
+		freq  int
+	}
+
+	colorsFreq := make([]colorFreq, 0, len(colorsMap))
+	for color, freq := range colorsMap {
+		colorsFreq = append(colorsFreq, colorFreq{color, freq})
+	}
+
+	sort.Slice(colorsFreq, func(i, j int) bool {
+		return colorsFreq[i].freq > colorsFreq[j].freq
+	})
+
+	colors := make([]color.Color, 0, max)
+	for i := 0; i < max; i++ {
+		colors = append(colors, colorsFreq[i].color)
 	}
 
 	return color.Palette(colors)

@@ -65,6 +65,7 @@ var parseMap = map[string]func(string) (interface{}, error){
 	"w":    func(s string) (interface{}, error) { return strconv.Atoi(s) },
 	"h":    func(s string) (interface{}, error) { return strconv.Atoi(s) },
 	"cy":   func(s string) (interface{}, error) { return strconv.Atoi(s) },
+	"pm":   func(s string) (interface{}, error) { return strconv.Atoi(s) },
 }
 
 var applyMap = map[string]func(interface{}) countdown.Option{
@@ -79,6 +80,7 @@ var applyMap = map[string]func(interface{}) countdown.Option{
 	"h":    func(v interface{}) countdown.Option { return countdown.WithHeight(v.(int)) },
 	"cy":   func(v interface{}) countdown.Option { return countdown.WithColonCompensation(v.(int)) },
 	"ca":   func(v interface{}) countdown.Option { return countdown.WithColonCompensationAuto() },
+	"pm":   func(v interface{}) countdown.Option { return countdown.WithPaletteMaxColors(v.(int)) },
 }
 
 func processRequest(req *http.Request) ([]countdown.Option, error) {

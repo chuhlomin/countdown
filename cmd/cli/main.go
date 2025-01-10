@@ -32,6 +32,7 @@ func run() error {
 	out := flag.String("o", "output.gif", "output file")
 	colonCompensation := flag.Int("cy", 0, "compensate for colon Y position")
 	colonCompensationAuto := flag.Bool("ca", false, "auto compensate for colon Y position")
+	paletteMaxColors := flag.Int("pm", 0, "max colors in palette")
 	flag.Parse()
 
 	if *fontPath == "" {
@@ -49,6 +50,7 @@ func run() error {
 		countdown.WithTimeFrom(*timeFrom),
 		countdown.WithMaxFrames(*maxFrames),
 		countdown.WithColonCompensation(*colonCompensation),
+		countdown.WithPaletteMaxColors(*paletteMaxColors),
 	}
 
 	if *colonCompensationAuto {
