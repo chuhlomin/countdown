@@ -30,6 +30,7 @@ type Generator struct {
 	maxFrames              int
 	colonCompensation      int
 	paletteMaxColors       int
+	paletteMaxColorsAuto   bool
 	colonCompoensationAuto bool
 	noLeadingZeros         bool
 }
@@ -87,7 +88,7 @@ func (g *Generator) Write(w io.Writer) error {
 		LoopCount: -1,
 	}
 
-	palette := choosePalette(frames, g.paletteMaxColors)
+	palette := choosePalette(frames, g.paletteMaxColors, g.paletteMaxColorsAuto)
 
 	for i, frame := range frames {
 		gw.Image[i] = image.NewPaletted(frame.Bounds(), palette)
@@ -193,7 +194,7 @@ func findMaxDigitsWidth(d *font.Drawer) (fixed.Int26_6, string) {
 	return max, maxS
 }
 
-func choosePalette(frames []image.Image, max int) color.Palette {
+func choosePalette(frames []image.Image, max int, auto bool) color.Palette {
 	colorsMap := map[color.Color]int{}
 
 	for _, frame := range frames {
@@ -207,7 +208,8 @@ func choosePalette(frames []image.Image, max int) color.Palette {
 		}
 	}
 
-	if max == 0 || len(colorsMap) <= max {
+	if !auto && (max == 0 || len(colorsMap) <= max) {
+		// return all colors
 		colors := make([]color.Color, 0, len(colorsMap))
 		for color := range colorsMap {
 			colors = append(colors, color)
@@ -230,6 +232,11 @@ func choosePalette(frames []image.Image, max int) color.Palette {
 	sort.Slice(colorsFreq, func(i, j int) bool {
 		return colorsFreq[i].freq > colorsFreq[j].freq
 	})
+
+	if auto {
+		// pick first 10% of most frequent colors
+		max = len(colorsFreq) / 10
+	}
 
 	colors := make([]color.Color, 0, max)
 	for i := 0; i < max; i++ {

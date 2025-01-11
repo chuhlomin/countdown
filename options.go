@@ -163,6 +163,13 @@ func WithPaletteMaxColors(n int) Option {
 	}
 }
 
+func WithPalleteMaxColorsAuto() Option {
+	return func(g *Generator) error {
+		g.paletteMaxColorsAuto = true
+		return nil
+	}
+}
+
 func WithoutLeadingZeros() Option {
 	return func(g *Generator) error {
 		g.noLeadingZeros = true

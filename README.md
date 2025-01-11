@@ -52,6 +52,7 @@ func main() {
 | `WithMaxFrames`             | `-max`   | `max`         | Max frames                           |              |
 | `WithoutLeadingZeros`       | `-no0`   | `no0`         | Do not show leading zeros            | false        |
 | `WithPaletteMaxColors`      | `-pm`    | `pm`          | Max colors in palette                | 256          |
+| `WithPalleteMaxColorsAuto`  | `-pma`   | `pma`         | Auto calculate optimal palette size  | false        |
 | `WithTargetTime`            | `-t`     | `t`           | Target time in Unix format           |              |
 | `WithTextColor`             | `-c`     | `c`           | Text color                           | "white"      |
 | `WithTimeFrom`              | `-from`  | `from`        | Duration to start countdown from     |              |
