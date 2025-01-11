@@ -66,6 +66,14 @@ If `WithColonCompensationAuto` flag is provided, `WithColonCompensation` flag wi
 
 `WithTargetTime` is an alternative to `WithTimeFrom` option. If both are provided, latter will be used.
 
+Examples of options effect:
+
+| Option                      | false                                                                                                  | true                                                                                             |
+| --------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `WithColonCompensationAuto` | ![noCA](https://github.com/user-attachments/assets/617efae8-fb08-4c2d-94bc-1c6d221b29bf)               | ![ca](https://github.com/user-attachments/assets/3e247c24-3cee-4017-9bc4-ec4f0d170d89)           |
+| `WithoutLeadingZeros`       | ![with0](https://github.com/user-attachments/assets/1ba438f7-5a00-440f-839d-df5e1fa96406)              | ![no0](https://github.com/user-attachments/assets/7be541fa-eb56-4e96-814f-24213b0426aa)          |
+| `WithPalleteMaxColorsAuto`  | ![allColors](https://github.com/user-attachments/assets/b815db57-773e-403d-b54f-7ac1a01063d4)<br>(37K) | ![pma](https://github.com/user-attachments/assets/d6546913-7601-4434-a4c9-5295c99a5051)<br>(27K) |
+
 ## cli
 
 At `cmd/cli` there is a simple CLI app that uses the library.
