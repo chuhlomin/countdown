@@ -83,7 +83,7 @@ var applyMap = map[string]func(interface{}) countdown.Option{
 	"ca":   func(v interface{}) countdown.Option { return countdown.WithColonCompensationAuto() },
 	"pm":   func(v interface{}) countdown.Option { return countdown.WithPaletteMaxColors(v.(int)) },
 	"t":    func(v interface{}) countdown.Option { return countdown.WithTargetTime(v.(int)) },
-	"no0":  func(v interface{}) countdown.Option { return countdown.WithTrimLeadingZeros() },
+	"no0":  func(v interface{}) countdown.Option { return countdown.WithoutLeadingZeros() },
 }
 
 func processRequest(req *http.Request) ([]countdown.Option, error) {
