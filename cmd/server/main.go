@@ -32,6 +32,25 @@ func main() {
 		}
 
 		gen, err := countdown.NewGenerator(opts...)
+		if err == countdown.ErrTargetTimeInPast {
+			// delete "t" from the query
+			query := req.URL.Query()
+			query.Del("t")
+			req.URL.RawQuery = query.Encode()
+			opts, err = processRequest(req)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("failed to process request: %v", err), http.StatusBadRequest)
+				return
+			}
+
+			gen, err = countdown.NewGenerator(
+				append(
+					opts,
+					countdown.WithTimeFrom(0),
+					countdown.WithMaxFrames(0),
+				)...,
+			)
+		}
 
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed to create generator: %v", err), http.StatusInternalServerError)
@@ -87,38 +106,45 @@ var applyMap = map[string]func(interface{}) countdown.Option{
 }
 
 func processRequest(req *http.Request) ([]countdown.Option, error) {
-	var opts []countdown.Option
-
 	var (
-		val interface{}
-		err error
+		opts []countdown.Option
+		err  error
 	)
 
 	// it's important to handle font size before font face
 	// because font face depends on font size
 	if v, ok := req.URL.Query()["s"]; ok {
-		val, err = parseMap["s"](v[0])
+		err := maybeAddOption(&opts, "s", v[0])
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse value for s: %v", err)
+			return nil, err
 		}
-		opts = append(opts, applyMap["s"](val))
-
-		delete(req.URL.Query(), "s")
 	}
 
 	for k, v := range req.URL.Query() {
-		val = v[0]
-		if parser, ok := parseMap[k]; ok {
-			val, err = parser(v[0])
-			if err != nil {
-				return nil, fmt.Errorf("failed to parse value for %s: %v", k, err)
-			}
-		}
-
-		if applier, ok := applyMap[k]; ok {
-			opts = append(opts, applier(val))
+		err = maybeAddOption(&opts, k, v[0])
+		if err != nil {
+			return nil, err
 		}
 	}
 
 	return opts, nil
+}
+
+func maybeAddOption(opts *[]countdown.Option, key string, value string) error {
+	var (
+		val interface{} = value
+		err error
+	)
+
+	if parser, ok := parseMap[key]; ok {
+		val, err = parser(value)
+		if err != nil {
+			return fmt.Errorf("failed to parse value for %s: %v", key, err)
+		}
+	}
+
+	if applier, ok := applyMap[key]; ok {
+		*opts = append(*opts, applier(val))
+	}
+	return nil
 }
