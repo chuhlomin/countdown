@@ -94,6 +94,18 @@ func processRequest(req *http.Request) ([]countdown.Option, error) {
 		err error
 	)
 
+	// it's important to handle font size before font face
+	// because font face depends on font size
+	if v, ok := req.URL.Query()["s"]; ok {
+		val, err = parseMap["s"](v[0])
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse value for s: %v", err)
+		}
+		opts = append(opts, applyMap["s"](val))
+
+		delete(req.URL.Query(), "s")
+	}
+
 	for k, v := range req.URL.Query() {
 		val = v[0]
 		if parser, ok := parseMap[k]; ok {
