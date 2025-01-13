@@ -19,30 +19,30 @@ import (
 )
 
 type Generator struct {
-	fontFace               font.Face
-	backgroundColor        color.Color
-	textColor              color.Color
-	backgroundImage        *image.Image
-	timeFrom               time.Duration
-	fontSize               float64
-	width                  int
-	height                 int
-	maxFrames              int
-	colonCompensation      int
-	paletteMaxColors       int
-	paletteMaxColorsAuto   bool
-	colonCompoensationAuto bool
-	noLeadingZeros         bool
+	FontFace               font.Face
+	BackgroundColor        color.Color
+	TextColor              color.Color
+	BackgroundImage        *image.Image
+	TimeFrom               time.Duration
+	FontSize               float64
+	Width                  int
+	Height                 int
+	MaxFrames              int
+	ColonCompensation      int
+	PaletteMaxColors       int
+	PaletteMaxColorsAuto   bool
+	ColonCompoensationAuto bool
+	NoLeadingZeros         bool
 }
 
 func NewGenerator(opts ...Option) (*Generator, error) {
 	g := &Generator{
-		width:           600,
-		height:          400,
-		fontSize:        48,
-		fontFace:        basicfont.Face7x13,
-		backgroundColor: color.Black,
-		textColor:       color.White,
+		Width:           600,
+		Height:          400,
+		FontSize:        48,
+		FontFace:        basicfont.Face7x13,
+		BackgroundColor: color.Black,
+		TextColor:       color.White,
 	}
 	for _, opt := range opts {
 		err := opt(g)
@@ -59,17 +59,17 @@ func (g *Generator) Write(w io.Writer) error {
 	var frames []image.Image
 
 	fontDrawer := &font.Drawer{
-		Src:  image.NewUniform(g.textColor),
-		Face: g.fontFace,
+		Src:  image.NewUniform(g.TextColor),
+		Face: g.FontFace,
 	}
 
-	if g.colonCompoensationAuto {
+	if g.ColonCompoensationAuto {
 		// for most fonts, the colon is placed at the bottom of the cell, and has x-height height
 		// to center it vertically, we need to move it up by (capHeight - xHeight) / 2
-		g.colonCompensation = (g.fontFace.Metrics().CapHeight.Ceil() - g.fontFace.Metrics().XHeight.Ceil()) / 2
+		g.ColonCompensation = (g.FontFace.Metrics().CapHeight.Ceil() - g.FontFace.Metrics().XHeight.Ceil()) / 2
 	}
 
-	for g.timeFrom > 0 && (g.maxFrames == 0 || count < g.maxFrames) {
+	for g.TimeFrom > 0 && (g.MaxFrames == 0 || count < g.MaxFrames) {
 		frame, err := g.renderFrame(fontDrawer)
 		if err != nil {
 			return fmt.Errorf("failed to render frame: %v", err)
@@ -78,7 +78,7 @@ func (g *Generator) Write(w io.Writer) error {
 		frames = append(frames, frame)
 
 		// decrease timeFrom by 1 second
-		g.timeFrom = g.timeFrom - time.Second
+		g.TimeFrom = g.TimeFrom - time.Second
 		count++
 	}
 
@@ -88,7 +88,7 @@ func (g *Generator) Write(w io.Writer) error {
 		LoopCount: -1,
 	}
 
-	palette := choosePalette(frames, g.paletteMaxColors, g.paletteMaxColorsAuto)
+	palette := choosePalette(frames, g.PaletteMaxColors, g.PaletteMaxColorsAuto)
 
 	for i, frame := range frames {
 		gw.Image[i] = image.NewPaletted(frame.Bounds(), palette)
@@ -105,11 +105,11 @@ func (g *Generator) Write(w io.Writer) error {
 
 func (g *Generator) renderFrame(d *font.Drawer) (image.Image, error) {
 	// create image 600×400 pixels with black background and white text
-	img := image.NewRGBA(image.Rect(0, 0, g.width, g.height))
-	draw.Draw(img, img.Bounds(), &image.Uniform{g.backgroundColor}, image.Point{}, draw.Src)
+	img := image.NewRGBA(image.Rect(0, 0, g.Width, g.Height))
+	draw.Draw(img, img.Bounds(), &image.Uniform{g.BackgroundColor}, image.Point{}, draw.Src)
 
-	if g.backgroundImage != nil {
-		draw.Draw(img, img.Bounds(), *g.backgroundImage, image.Point{}, draw.Over)
+	if g.BackgroundImage != nil {
+		draw.Draw(img, img.Bounds(), *g.BackgroundImage, image.Point{}, draw.Over)
 	}
 
 	d.Dst = img
@@ -117,7 +117,7 @@ func (g *Generator) renderFrame(d *font.Drawer) (image.Image, error) {
 	// not all fonts support tabular numbers,
 	// so to avoid text jumping, we need to split it into parts
 	// and draw each part separately, keeping ":" at the same position
-	parts := formatTime(g.timeFrom, g.noLeadingZeros)
+	parts := formatTime(g.TimeFrom, g.NoLeadingZeros)
 
 	colonWidth := d.MeasureString(":")
 	maxDigitsWidth, digit := findMaxDigitsWidth(d)
@@ -127,14 +127,14 @@ func (g *Generator) renderFrame(d *font.Drawer) (image.Image, error) {
 	}
 
 	x := (fixed.I(img.Bounds().Dx()) - totalWidth) / 2
-	y := fixed.I(img.Bounds().Dy()+g.fontFace.Metrics().CapHeight.Ceil()) / 2
+	y := fixed.I(img.Bounds().Dy()+g.FontFace.Metrics().CapHeight.Ceil()) / 2
 	d.Dot = fixed.Point26_6{X: x, Y: y}
 
 	for i, part := range parts {
 		d.Dot.X = x
 
 		if i > 0 {
-			d.Dot.Y -= fixed.I(g.colonCompensation)
+			d.Dot.Y -= fixed.I(g.ColonCompensation)
 			d.DrawString(":")
 			d.Dot.Y = y
 			x += colonWidth

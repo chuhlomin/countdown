@@ -19,21 +19,21 @@ type Option func(*Generator) error
 
 func WithWidth(width int) Option {
 	return func(g *Generator) error {
-		g.width = width
+		g.Width = width
 		return nil
 	}
 }
 
 func WithHeight(height int) Option {
 	return func(g *Generator) error {
-		g.height = height
+		g.Height = height
 		return nil
 	}
 }
 
 func WithFontSize(size float64) Option {
 	return func(g *Generator) error {
-		g.fontSize = size
+		g.FontSize = size
 		return nil
 	}
 }
@@ -45,7 +45,7 @@ func WithFontPath(path string) Option {
 		}
 
 		var err error
-		g.fontFace, err = loadFont(path, g.fontSize)
+		g.FontFace, err = loadFont(path, g.FontSize)
 		if err != nil {
 			return fmt.Errorf("failed to load font: %v", err)
 		}
@@ -56,7 +56,7 @@ func WithFontPath(path string) Option {
 func WithFontOpenTypeData(data []byte) Option {
 	return func(g *Generator) error {
 		var err error
-		g.fontFace, err = loadOpenTypeFont(data, g.fontSize)
+		g.FontFace, err = loadOpenTypeFont(data, g.FontSize)
 		if err != nil {
 			return fmt.Errorf("failed to load font: %v", err)
 		}
@@ -70,7 +70,7 @@ func WithBackgroundColor(c string) Option {
 		if err != nil {
 			return fmt.Errorf("failed to parse color: %v", err)
 		}
-		g.backgroundColor = col
+		g.BackgroundColor = col
 		return nil
 	}
 }
@@ -82,7 +82,7 @@ func WithBackgroundImagePath(path string) Option {
 		}
 
 		var err error
-		g.backgroundImage, err = loadImage(path)
+		g.BackgroundImage, err = loadImage(path)
 		if err != nil {
 			return fmt.Errorf("failed to load image: %v", err)
 		}
@@ -93,7 +93,7 @@ func WithBackgroundImagePath(path string) Option {
 func WithBackgroundImageData(data []byte) Option {
 	return func(g *Generator) error {
 		var err error
-		g.backgroundImage, err = loadImageData(data)
+		g.BackgroundImage, err = loadImageData(data)
 		if err != nil {
 			return fmt.Errorf("failed to load image: %v", err)
 		}
@@ -107,14 +107,14 @@ func WithTextColor(c string) Option {
 		if err != nil {
 			return fmt.Errorf("failed to parse color: %v", err)
 		}
-		g.textColor = col
+		g.TextColor = col
 		return nil
 	}
 }
 
 func WithTimeFrom(d time.Duration) Option {
 	return func(g *Generator) error {
-		g.timeFrom = d
+		g.TimeFrom = d
 		return nil
 	}
 }
@@ -124,8 +124,8 @@ func WithTargetTime(t int) Option {
 		if t == 0 {
 			return nil
 		}
-		g.timeFrom = time.Until(time.Unix(int64(t), 0))
-		if g.timeFrom < 0 {
+		g.TimeFrom = time.Until(time.Unix(int64(t), 0))
+		if g.TimeFrom < 0 {
 			return fmt.Errorf("target time is in the past")
 		}
 		return nil
@@ -134,21 +134,21 @@ func WithTargetTime(t int) Option {
 
 func WithMaxFrames(max int) Option {
 	return func(g *Generator) error {
-		g.maxFrames = max
+		g.MaxFrames = max
 		return nil
 	}
 }
 
 func WithColonCompensation(y int) Option {
 	return func(g *Generator) error {
-		g.colonCompensation = y
+		g.ColonCompensation = y
 		return nil
 	}
 }
 
 func WithColonCompensationAuto() Option {
 	return func(g *Generator) error {
-		g.colonCompoensationAuto = true
+		g.ColonCompoensationAuto = true
 		return nil
 	}
 }
@@ -158,21 +158,21 @@ func WithPaletteMaxColors(n int) Option {
 		if n <= 0 {
 			return nil
 		}
-		g.paletteMaxColors = n
+		g.PaletteMaxColors = n
 		return nil
 	}
 }
 
 func WithPalleteMaxColorsAuto() Option {
 	return func(g *Generator) error {
-		g.paletteMaxColorsAuto = true
+		g.PaletteMaxColorsAuto = true
 		return nil
 	}
 }
 
 func WithoutLeadingZeros() Option {
 	return func(g *Generator) error {
-		g.noLeadingZeros = true
+		g.NoLeadingZeros = true
 		return nil
 	}
 }
