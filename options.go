@@ -15,6 +15,8 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
+var ErrTargetTimeInPast = fmt.Errorf("target time is in the past")
+
 type Option func(*Generator) error
 
 func WithWidth(width int) Option {
@@ -126,7 +128,7 @@ func WithTargetTime(t int) Option {
 		}
 		g.TimeFrom = time.Until(time.Unix(int64(t), 0))
 		if g.TimeFrom < 0 {
-			return fmt.Errorf("target time is in the past")
+			return ErrTargetTimeInPast
 		}
 		return nil
 	}
