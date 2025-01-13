@@ -69,7 +69,7 @@ func (g *Generator) Write(w io.Writer) error {
 		g.ColonCompensation = (g.FontFace.Metrics().CapHeight.Ceil() - g.FontFace.Metrics().XHeight.Ceil()) / 2
 	}
 
-	for g.TimeFrom > 0 && (g.MaxFrames == 0 || count < g.MaxFrames) {
+	for g.TimeFrom >= 0 && (g.MaxFrames == 0 || count < g.MaxFrames) {
 		frame, err := g.renderFrame(fontDrawer)
 		if err != nil {
 			return fmt.Errorf("failed to render frame: %v", err)
