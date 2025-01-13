@@ -55,6 +55,7 @@ func HandlerRoot() http.HandlerFunc {
 			return
 		}
 
+		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "image/gif")
 		w.Header().Set("Content-Length", fmt.Sprintf("%d", buf.Len()))
 		w.Header().Set("Cache-Control", "no-store")
