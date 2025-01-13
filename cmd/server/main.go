@@ -13,7 +13,7 @@ var fonts embed.FS
 var img embed.FS
 
 func main() {
-	http.HandleFunc("/", HandlerRoot)
+	http.Handle("/", HandlerRoot())
 
 	log.Println("Starting server on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {

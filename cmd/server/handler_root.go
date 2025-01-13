@@ -10,54 +10,56 @@ import (
 	"github.com/chuhlomin/countdown"
 )
 
-func HandlerRoot(w http.ResponseWriter, req *http.Request) {
-	if req.URL.Path != "/" {
-		http.NotFound(w, req)
-		return
-	}
+func HandlerRoot() http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path != "/" {
+			http.NotFound(w, req)
+			return
+		}
 
-	opts, err := processRequest(req)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed to process request: %v", err), http.StatusBadRequest)
-		return
-	}
-
-	gen, err := countdown.NewGenerator(opts...)
-	if err == countdown.ErrTargetTimeInPast {
-		// delete "t" from the query
-		query := req.URL.Query()
-		query.Del("t")
-		req.URL.RawQuery = query.Encode()
-		opts, err = processRequest(req)
+		opts, err := processRequest(req)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed to process request: %v", err), http.StatusBadRequest)
 			return
 		}
 
-		gen, err = countdown.NewGenerator(
-			append(
-				opts,
-				countdown.WithTimeFrom(0),
-				countdown.WithMaxFrames(0),
-			)...,
-		)
-	}
+		gen, err := countdown.NewGenerator(opts...)
+		if err == countdown.ErrTargetTimeInPast {
+			// delete "t" from the query
+			query := req.URL.Query()
+			query.Del("t")
+			req.URL.RawQuery = query.Encode()
+			opts, err = processRequest(req)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("failed to process request: %v", err), http.StatusBadRequest)
+				return
+			}
 
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed to create generator: %v", err), http.StatusInternalServerError)
-		return
-	}
+			gen, err = countdown.NewGenerator(
+				append(
+					opts,
+					countdown.WithTimeFrom(0),
+					countdown.WithMaxFrames(0),
+				)...,
+			)
+		}
 
-	buf := new(bytes.Buffer)
-	if err := gen.Write(buf); err != nil {
-		http.Error(w, fmt.Sprintf("failed to generate GIF: %v", err), http.StatusInternalServerError)
-		return
-	}
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to create generator: %v", err), http.StatusInternalServerError)
+			return
+		}
 
-	w.Header().Set("Content-Type", "image/gif")
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", buf.Len()))
-	w.Header().Set("Cache-Control", "no-store")
-	w.Write(buf.Bytes())
+		buf := new(bytes.Buffer)
+		if err := gen.Write(buf); err != nil {
+			http.Error(w, fmt.Sprintf("failed to generate GIF: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "image/gif")
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", buf.Len()))
+		w.Header().Set("Cache-Control", "no-store")
+		w.Write(buf.Bytes())
+	}
 }
 
 var parseMap = map[string]func(string) (interface{}, error){
