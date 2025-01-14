@@ -44,6 +44,11 @@ func HandlerRoot() http.HandlerFunc {
 			)
 		}
 
+		if gen.Width > 1000 || gen.Height > 1000 {
+			http.Error(w, "width and height must be less than 1000", http.StatusBadRequest)
+			return
+		}
+
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed to create generator: %v", err), http.StatusInternalServerError)
 			return
