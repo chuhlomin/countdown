@@ -22,7 +22,7 @@ func main() {
 
 	gen, err := countdown.NewGenerator(
 		countdown.WithFontPath(fontPath),
-		countdown.WithBackgroundImage(image),
+		countdown.WithBackgroundImagePath(imagePath),
 		countdown.WithTimeFrom(2 * time.Hour),
 		...
 	)
@@ -41,12 +41,12 @@ func main() {
 | --------------------------- | -------- | ------------- | ------------------------------------ | ------------ |
 | `WithBackgroundColor`       | `-bg`    | `bg`          | Background color                     | "black"      |
 | `WithBackgroundImageData`   |          |               | Background image bytes (optional)    |              |
-| `WithBackgroundImagePath`   | `-bi`    | `bi`          | Path to background image (optional)  |              |
+| `WithBackgroundImagePath`   | `-bi`    |               | Path to background image (optional)  |              |
 | `WithColonCompensationAuto` | `-ca`    | `ca`          | Auto compensate for colon Y position | false        |
 | `WithColonCompensation`     | `-cy`    | `cy`          | Compensate for colon Y position      | 0            |
 | `WithFontOpenTypeData`      |          |               | OpenType font bytes                  |              |
-| `WithFontPath`              | `-f`     | `f`           | Path to font file                    |              |
-| `WithFontSize`              | `-s`     | `s`           | Font size                            | 48           |
+| `WithFontPath`              | `-f`     |               | Path to font file                    |              |
+| `WithFontSize`              | `-s`     |               | Font size                            | 48           |
 | `WithImageHeight`           | `-h`     | `h`           | Image height                         | 400          |
 | `WithImageWidth`            | `-w`     | `w`           | Image width                          | 600          |
 | `WithMaxFrames`             | `-max`   | `max`         | Max frames                           |              |
@@ -101,20 +101,10 @@ Start it with:
 go run ./cmd/server
 ```
 
-Then open `http://localhost:8080/?from=1m` in your browser.
+Then open `http://localhost:8191/?from=1m` in your browser.
 
 It supports almost the same flags as the CLI app, but they should be passed as query parameters, e.g.:
 
 ```
-http://localhost:8080/?s=100&f=Gorton%20Digital%20Light.otf&bg=%23E2D9C5&c=%23141414&from=2h&max=10&ca&bi=retro.png
+http://localhost:8191/?bg=%23E2D9C5&c=%23141414&from=2h&max=10&ca&w=200&h=100
 ```
-
-(assuming you have `cmd/server/fonts` directory)
-
-Docker-compose file is provided for the server:
-
-```
-docker-compose up
-```
-
-Then open `http://localhost:8080/?s=140&f=Gidolinya-Regular.otf&bg=%23E2D9C5&c=%23141414&from=2h&max=10&ca&bi=retro.png` in your browser.
