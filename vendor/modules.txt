@@ -3,6 +3,7 @@
 golang.org/x/image/colornames
 golang.org/x/image/font
 golang.org/x/image/font/basicfont
+golang.org/x/image/font/gofont/gobold
 golang.org/x/image/font/opentype
 golang.org/x/image/font/sfnt
 golang.org/x/image/math/fixed
